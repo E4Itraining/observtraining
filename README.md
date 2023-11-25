@@ -1,2 +1,2 @@
 # Art of observability
-training
+training's project on observability
