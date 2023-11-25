@@ -1,2 +1,2 @@
-# observtraining
+# Art of observability
 training
