@@ -1,0 +1,29 @@
+Plan
+
+1ere partie: Qu'est-ce que l'observabilité?
+
+1) l'observabilité :un concept qui n'est pas récent
+2) définition
+
+2ème partie: Avant de parler observabilité, parlons de monitoring
+
+1) Le monitoring où l'art de surveiller et de détecter un problème
+2) Les limites du monitoring 
+3) quand le monitoring dit "quoi",l'observabilité répond "pourquoi"
+
+3ème partie: Pourquoi mettre en place une stratégie d'observabilité?
+1) Avoir une meilleure compréhension de son SI
+2) Optimiser sa stratégie de service et la gouvernance de son SI
+
+4ème partie: Comment mettre en place une stratégie d'observabilité?
+
+5ème partie: La mise en place de l'observabilité
+
+1) les outils
+2) étude de cas
+2.1: observabilité appliquée à une infrastructure type cloud
+2.2: observabilité appliquée à une application
+2.3: observabilité appliquée au réseau
+2.4: observabilité appliquée à la sécurité
+
+6ème partie: Le futur de l'observabilité
