@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPC Observability - Architecture Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #141c2e;
+            --bg-card: #1e2a42;
+            --text-primary: #f1f5f9;
+            --text-secondary: #a8b8d0;
+            --text-highlight: #ffffff;
+            --accent-blue: #4a9eff;
+            --accent-green: #22d3a8;
+            --accent-orange: #ffb347;
+            --accent-red: #ff6b6b;
+            --accent-purple: #a78bfa;
+            --border-subtle: rgba(255,255,255,0.08);
+            --border-accent: rgba(74,158,255,0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            padding: 2.5rem;
+            font-size: 16px;
+        }
+        
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            padding: 3rem 2rem;
+            background: linear-gradient(145deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border-accent);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-highlight);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .intro-text {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(74,158,255,0.08);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.9;
+            text-align: left;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .section h2 {
+            color: var(--text-highlight);
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-blue);
+            font-size: 1.6rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section h2 .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .mermaid {
+            background: var(--bg-card);
+            padding: 3rem;
+            border-radius: 16px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-subtle);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            background: rgba(74,158,255,0.06);
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 0 12px 12px 0;
+            font-size: 1.05rem;
+            line-height: 1.9;
+        }
+        
+        .key-concepts {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+        
+        .key-concepts h4 {
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .key-concepts ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .key-concepts li {
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-left: 3px solid var(--accent-purple);
+        }
+        
+        .key-concepts li strong {
+            color: var(--text-primary);
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .tip-box {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(34,211,168,0.08);
+            border: 1px solid rgba(34,211,168,0.2);
+            border-radius: 12px;
+        }
+        
+        .tip-box h4 {
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .tip-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 3rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+        }
+        
+        footer .brand {
+            color: var(--accent-purple);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        footer .tagline {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .section {
+                padding: 1.5rem;
+            }
+            .mermaid {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HPC Observability Architecture</h1>
+            <p class="subtitle">A Complete Guide to Monitoring High-Performance Computing Clusters</p>
+            <div class="intro-text">
+                <p>This document presents the reference architecture for implementing full observability on HPC (High-Performance Computing) clusters. You will find diagrams covering the entire metrics pipeline, from hardware-level collection on compute nodes to centralized visualization in Grafana. Each section explains the role of components and best practices for deployment at scale.</p>
+            </div>
+        </header>
+
+        <!-- Section 1: Global Architecture -->
+        <div class="section">
+            <h2><span class="section-number">1</span> Global Architecture - Complete Stack Overview</h2>
+            <p class="description">
+                The observability architecture is organized into four distinct layers, each with a specific responsibility. This separation of concerns enables independent scaling, easier troubleshooting, and clear data flow understanding. Data flows upward from hardware through collection agents, gets aggregated and stored, then presented to operators and alerting systems.
+            </p>
+            <div class="mermaid">
+flowchart LR
+    subgraph COLLECT["1. COLLECTION"]
+        NE[node_exporter]
+        DCGM[dcgm_exporter]
+        IPMI[ipmi_exporter]
+        IB[infiniband_exporter]
+        SL[slurm_exporter]
+        LU[lustre_exporter]
+    end
+    
+    subgraph AGGREGATION["2. AGGREGATION"]
+        AG[vmagent<br/>per rack]
+        PT[Promtail]
+    end
+    
+    subgraph STORAGE["3. STORAGE"]
+        VMI[vminsert]
+        VMS[(vmstorage)]
+        VMSE[vmselect]
+        LOKI[(Loki)]
+        VMA[vmalert]
+    end
+    
+    subgraph PRESENTATION["4. PRESENTATION"]
+        GF[Grafana]
+        AM[Alertmanager]
+        KM[Karma]
+    end
+    
+    NE --> AG
+    DCGM --> AG
+    IPMI --> AG
+    IB --> AG
+    SL --> AG
+    LU --> AG
+    
+    AG -->|remote_write| VMI
+    VMI --> VMS
+    VMS --> VMSE
+    
+    PT -->|push| LOKI
+    
+    VMSE --> GF
+    LOKI --> GF
+    VMA --> AM
+    AM --> KM
+    
+    classDef collect fill:#ffb347,stroke:#ffc87a,color:#000
+    classDef aggregation fill:#22d3a8,stroke:#5eead4,color:#000
+    classDef storage fill:#4a9eff,stroke:#7ab8ff,color:#fff
+    classDef presentation fill:#a78bfa,stroke:#c4b5fd,color:#fff
+    
+    class NE,DCGM,IPMI,IB,SL,LU collect
+    class AG,PT aggregation
+    class VMI,VMS,VMSE,LOKI,VMA storage
+    class GF,AM,KM presentation
+            </div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background:#ffb347"></div> 1. Collection (Per-Node Exporters)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#22d3a8"></div> 2. Aggregation (Per-Rack Agents)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#4a9eff"></div> 3. Storage (Time Series & Logs)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#a78bfa"></div> 4. Presentation (Dashboards & Alerts)</div>
+            </div>
+            <div class="key-concepts">
+                <h4>Key Concepts Explained</h4>
+                <ul>
+                    <li><strong>Exporters:</strong> Lightweight processes exposing metrics in Prometheus format on HTTP endpoints</li>
+                    <li><strong>vmagent:</strong> Efficient scraper that collects metrics and forwards them via remote_write protocol</li>
+                    <li><strong>VictoriaMetrics:</strong> High-performance time series database, Prometheus-compatible with better compression</li>
+                    <li><strong>Loki:</strong> Log aggregation system designed to work seamlessly with Grafana</li>
+                    <li><strong>vmalert:</strong> Alerting engine that evaluates rules and triggers notifications</li>
+                    <li><strong>Karma:</strong> Multi-cluster alert dashboard for Alertmanager with grouping and silencing</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2: Data Flow -->
+        <div class="section">
+            <h2><span class="section-number">2</span> Data Flow - From Node to Storage</h2>
+            <p class="description">
+                Understanding the data journey is essential for troubleshooting and capacity planning. Metrics follow a pull-then-push model: vmagent actively scrapes exporters (pull), then batches and compresses data before sending to storage (push via remote_write). This hybrid approach minimizes compute node overhead while ensuring reliable delivery.
+            </p>
+            <div class="mermaid">
+sequenceDiagram
+    participant N as Compute Node
+    participant E as Exporters
+    participant A as vmagent (rack)
+    participant I as vminsert
+    participant S as vmstorage
+    participant Q as vmselect
+    participant G as Grafana
+
+    Note over N,E: Local collection (minimal footprint)
+    N->>E: Expose metrics
+    E-->>E: node:9100, dcgm:9400, ipmi:9290
+    
+    Note over E,A: Pull every 15-60 seconds
+    A->>E: GET /metrics
+    E->>A: Prometheus format metrics
+    
+    Note over A,I: Batch + compression
+    A->>A: Relabeling, filtering
+    A->>I: POST /insert (remote_write)
+    
+    Note over I,S: Replication & sharding
+    I->>S: Write to shard
+    S->>S: Compression & indexing
+    
+    Note over Q,G: Query on-demand
+    G->>Q: PromQL query
+    Q->>S: Fetch time series
+    S->>Q: Data blocks
+    Q->>G: Results
+            </div>
+            <div class="tip-box">
+                <h4>Performance Tip</h4>
+                <p>Set scrape intervals based on metric criticality: 15s for critical hardware metrics (GPU temperature, ECC errors), 30s for performance metrics, and 60s for capacity metrics. This reduces storage costs while maintaining responsiveness for critical alerts.</p>
+            </div>
+        </div>
+
+        <!-- Section 3: VictoriaMetrics Cluster -->
+        <div class="section">
+            <h2><span class="section-number">3</span> VictoriaMetrics Cluster Architecture</h2>
+            <p class="description">
+                For large HPC environments (1000+ nodes), a clustered VictoriaMetrics deployment provides horizontal scalability and high availability. The architecture separates write path (vminsert), storage (vmstorage), and read path (vmselect), allowing independent scaling of each component based on workload characteristics.
+            </p>
+            <div class="mermaid">
+flowchart TB
+    subgraph LB["LOAD BALANCER"]
+        HAP[HAProxy / Nginx]
+    end
+    
+    subgraph INSERT["WRITE PATH"]
+        I1[vminsert #1]
+        I2[vminsert #2]
+        I3[vminsert #3]
+    end
+    
+    subgraph STORAGE["STORAGE LAYER"]
+        S1[(vmstorage #1<br/>NVMe 2TB)]
+        S2[(vmstorage #2<br/>NVMe 2TB)]
+        S3[(vmstorage #3<br/>NVMe 2TB)]
+    end
+    
+    subgraph SELECT["QUERY PATH"]
+        Q1[vmselect #1]
+        Q2[vmselect #2]
+        Q3[vmselect #3]
+    end
+    
+    subgraph CLIENTS["CLIENTS"]
+        VA[vmagent<br/>racks]
+        GF[Grafana]
+        API[API clients]
+    end
+    
+    VA -->|write| HAP
+    HAP --> I1 & I2 & I3
+    
+    I1 -->|replication| S1 & S2
+    I2 -->|replication| S2 & S3
+    I3 -->|replication| S1 & S3
+    
+    S1 & S2 & S3 --> Q1 & Q2 & Q3
+    
+    Q1 & Q2 & Q3 --> HAP
+    HAP -->|query| GF
+    HAP -->|query| API
+    
+    classDef lb fill:#ffb347,stroke:#ffc87a,color:#000
+    classDef insert fill:#22d3a8,stroke:#5eead4,color:#000
+    classDef storage fill:#4a9eff,stroke:#7ab8ff,color:#fff
+    classDef select fill:#a78bfa,stroke:#c4b5fd,color:#fff
+    classDef client fill:#64748b,stroke:#94a3b8,color:#fff
+    
+    class HAP lb
+    class I1,I2,I3 insert
+    class S1,S2,S3 storage
+    class Q1,Q2,Q3 select
+    class VA,GF,API client
+            </div>
+            <div class="key-concepts">
+                <h4>Architecture Benefits</h4>
+                <ul>
+                    <li><strong>Replication Factor 2:</strong> Each data point is stored on 2 nodes, surviving single node failures</li>
+                    <li><strong>Stateless Insert/Select:</strong> Easy horizontal scaling by adding more instances behind load balancer</li>
+                    <li><strong>NVMe Storage:</strong> High IOPS required for millions of metrics per second ingestion</li>
+                    <li><strong>Independent Scaling:</strong> Scale writes vs reads separately based on actual demand</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 4: Slurm Integration -->
+        <div class="section">
+            <h2><span class="section-number">4</span> Slurm Integration - HPC Job Scheduler</h2>
+            <p class="description">
+                Correlating metrics with job execution is crucial for HPC observability. By integrating with Slurm's prolog and epilog scripts, we automatically enrich metrics with job context (job ID, user, partition, queue time). This enables per-job resource analysis and helps identify inefficient workloads.
+            </p>
+            <div class="mermaid">
+flowchart LR
+    subgraph SLURM["SLURM CONTROLLER"]
+        SC[slurmctld]
+        SE[slurm_exporter]
+        PR[Prolog Script]
+        EP[Epilog Script]
+    end
+    
+    subgraph NODE["COMPUTE NODE"]
+        JOB[Running Job<br/>JobID: 12345]
+        EXP[Exporters]
+        TGT[Dynamic Target<br/>job_12345.yml]
+    end
+    
+    subgraph OBS["OBSERVABILITY"]
+        VA[vmagent]
+        VM[(VictoriaMetrics)]
+        GF[Grafana]
+    end
+    
+    SC -->|submit job| PR
+    PR -->|create| TGT
+    PR -->|annotation start| VM
+    
+    JOB --> EXP
+    TGT --> VA
+    VA -->|scrape with labels| EXP
+    VA -->|job_id, user, partition| VM
+    
+    JOB -->|complete| EP
+    EP -->|annotation end| VM
+    EP -->|delete| TGT
+    
+    SE --> VA
+    VM --> GF
+    
+    classDef slurm fill:#ff6b6b,stroke:#ffa8a8,color:#fff
+    classDef node fill:#ffb347,stroke:#ffc87a,color:#000
+    classDef obs fill:#4a9eff,stroke:#7ab8ff,color:#fff
+    
+    class SC,SE,PR,EP slurm
+    class JOB,EXP,TGT node
+    class VA,VM,GF obs
+            </div>
+            <div class="tip-box">
+                <h4>Implementation Note</h4>
+                <p>The prolog script creates a YAML file in vmagent's file_sd_configs directory, adding job-specific labels. When the job completes, the epilog script removes this file and records job duration. This dynamic target discovery ensures metrics are always labeled with the correct job context without manual intervention.</p>
+            </div>
+        </div>
+
+        <!-- Section 5: GPU Monitoring -->
+        <div class="section">
+            <h2><span class="section-number">5</span> GPU Monitoring - DCGM Architecture</h2>
+            <p class="description">
+                GPU monitoring is critical in HPC environments where compute costs are dominated by accelerator time. NVIDIA's DCGM (Data Center GPU Manager) provides comprehensive telemetry including utilization, temperature, power consumption, memory usage, and critically, ECC errors that can indicate hardware degradation before catastrophic failure.
+            </p>
+            <div class="mermaid">
+flowchart TB
+    subgraph GPU["GPU HARDWARE"]
+        G0[GPU 0]
+        G1[GPU 1]
+        G2[GPU 2]
+        G3[GPU 3]
+        G4[GPU 4]
+        G5[GPU 5]
+        G6[GPU 6]
+        G7[GPU 7]
+    end
+    
+    subgraph DCGM["DCGM STACK"]
+        DRV[NVIDIA Driver]
+        DCG[dcgm-exporter<br/>:9400]
+    end
+    
+    subgraph METRICS["KEY METRICS"]
+        UT[GPU_UTIL<br/>Utilization %]
+        TMP[GPU_TEMP<br/>Temperature C]
+        PWR[POWER_USAGE<br/>Watts]
+        MEM[MEM_UTIL<br/>Memory %]
+        ECC[ECC_ERRORS<br/>Single/Double bit]
+        XID[XID_ERRORS<br/>Critical errors]
+    end
+    
+    subgraph ALERTS["CRITICAL ALERTS"]
+        A1[Thermal Throttle > 83C]
+        A2[ECC Double-bit Error]
+        A3[XID Fatal Errors]
+        A4[Low Utilization < 50%]
+    end
+    
+    G0 & G1 & G2 & G3 & G4 & G5 & G6 & G7 --> DRV
+    DRV --> DCG
+    DCG --> UT & TMP & PWR & MEM & ECC & XID
+    
+    TMP --> A1
+    ECC --> A2
+    XID --> A3
+    UT --> A4
+    
+    classDef gpu fill:#22d3a8,stroke:#5eead4,color:#000
+    classDef dcgm fill:#4a9eff,stroke:#7ab8ff,color:#fff
+    classDef metric fill:#a78bfa,stroke:#c4b5fd,color:#fff
+    classDef alert fill:#ff6b6b,stroke:#ffa8a8,color:#fff
+    
+    class G0,G1,G2,G3,G4,G5,G6,G7 gpu
+    class DRV,DCG dcgm
+    class UT,TMP,PWR,MEM,ECC,XID metric
+    class A1,A2,A3,A4 alert
+            </div>
+            <div class="key-concepts">
+                <h4>Critical GPU Metrics Explained</h4>
+                <ul>
+                    <li><strong>ECC Single-bit:</strong> Correctable errors, track trend over time. Increasing rate indicates aging memory</li>
+                    <li><strong>ECC Double-bit:</strong> Uncorrectable errors, immediate action required. Can cause silent data corruption</li>
+                    <li><strong>XID Errors:</strong> NVIDIA error codes for various GPU failures. XID 79 (fallen off bus) is critical</li>
+                    <li><strong>Thermal Throttling:</strong> Performance reduction at 83C. Sustained throttling wastes expensive compute time</li>
+                    <li><strong>Low Utilization:</strong> GPUs below 50% may indicate poorly optimized workloads or scheduling issues</li>
+                    <li><strong>Power Draw:</strong> Abnormal power consumption can indicate workload issues or hardware problems</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 6: Alerting Pipeline -->
+        <div class="section">
+            <h2><span class="section-number">6</span> Alerting Pipeline</h2>
+            <p class="description">
+                An effective alerting pipeline prevents job failures and reduces mean time to recovery (MTTR). The architecture routes alerts by severity, groups related alerts to reduce noise, and integrates with incident management systems. For HPC environments, early detection of hardware issues can save hours of lost computation.
+            </p>
+            <div class="mermaid">
+flowchart LR
+    subgraph RULES["VMALERT RULES"]
+        R1[Hardware Critical<br/>ECC, Link Down]
+        R2[Performance Warning<br/>Throttle, Memory]
+        R3[Anomaly Detection<br/>Inter-node variance]
+    end
+    
+    subgraph AM["ALERTMANAGER"]
+        RT[Routing]
+        GR[Grouping]
+        SL[Silencing]
+        INH[Inhibition]
+    end
+    
+    subgraph NOTIFY["NOTIFICATIONS"]
+        PD[PagerDuty<br/>Critical]
+        SLK[Slack<br/>Warning]
+        EM[Email<br/>Info]
+        KRM[Karma<br/>Dashboard]
+    end
+    
+    subgraph ACTION["AUTOMATED ACTIONS"]
+        A1[Drain Node<br/>via Slurm]
+        A2[Create Ticket<br/>in ITSM]
+        A3[Log Event<br/>for Audit]
+    end
+    
+    R1 & R2 & R3 --> RT
+    RT --> GR --> SL --> INH
+    
+    INH -->|severity=critical| PD
+    INH -->|severity=warning| SLK
+    INH -->|severity=info| EM
+    INH --> KRM
+    
+    PD --> A1
+    SLK --> A2
+    EM --> A3
+    
+    classDef rules fill:#ffb347,stroke:#ffc87a,color:#000
+    classDef am fill:#4a9eff,stroke:#7ab8ff,color:#fff
+    classDef notify fill:#a78bfa,stroke:#c4b5fd,color:#fff
+    classDef action fill:#22d3a8,stroke:#5eead4,color:#000
+    
+    class R1,R2,R3 rules
+    class RT,GR,SL,INH am
+    class PD,SLK,EM,KRM notify
+    class A1,A2,A3 action
+            </div>
+            <div class="key-concepts">
+                <h4>Alertmanager Concepts</h4>
+                <ul>
+                    <li><strong>Routing:</strong> Directs alerts to appropriate receivers based on labels (severity, team, cluster)</li>
+                    <li><strong>Grouping:</strong> Combines related alerts into single notification to reduce alert fatigue</li>
+                    <li><strong>Silencing:</strong> Temporarily mutes alerts during maintenance windows</li>
+                    <li><strong>Inhibition:</strong> Suppresses lower-priority alerts when higher-priority alert fires (e.g., node down inhibits all node alerts)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 7: Dashboard Hierarchy -->
+        <div class="section">
+            <h2><span class="section-number">7</span> Grafana Dashboard Hierarchy</h2>
+            <p class="description">
+                Dashboards are organized in a drill-down hierarchy, from cluster-wide KPIs to individual component diagnostics. This structure enables operators to quickly identify problems at a high level, then navigate to detailed views for root cause analysis. Each level answers progressively more specific questions about system health.
+            </p>
+            <div class="mermaid">
+flowchart TB
+    subgraph L1["LEVEL 1 - CLUSTER OVERVIEW"]
+        CL[Cluster Health<br/>Global KPIs, SLA status]
+    end
+    
+    subgraph L2["LEVEL 2 - INFRASTRUCTURE"]
+        RK[Racks Overview<br/>Status per rack]
+        NT[Network<br/>InfiniBand, Ethernet]
+        ST[Storage<br/>Lustre, GPFS]
+        SC[Scheduler<br/>Slurm queues]
+    end
+    
+    subgraph L3["LEVEL 3 - RESOURCES"]
+        ND[Node Detail<br/>CPU, RAM, Disk]
+        GP[GPU Detail<br/>Utilization, Temp]
+        JB[Job Analysis<br/>Per-job performance]
+    end
+    
+    subgraph L4["LEVEL 4 - DIAGNOSTICS"]
+        HW[Hardware Health<br/>IPMI sensors]
+        LG[Logs Explorer<br/>Loki queries]
+        AL[Alert History<br/>Timeline view]
+    end
+    
+    CL --> RK & NT & ST & SC
+    RK --> ND
+    ND --> GP
+    SC --> JB
+    GP --> HW
+    JB --> LG
+    ND --> AL
+    
+    classDef l1 fill:#ff6b6b,stroke:#ffa8a8,color:#fff
+    classDef l2 fill:#ffb347,stroke:#ffc87a,color:#000
+    classDef l3 fill:#22d3a8,stroke:#5eead4,color:#000
+    classDef l4 fill:#4a9eff,stroke:#7ab8ff,color:#fff
+    
+    class CL l1
+    class RK,NT,ST,SC l2
+    class ND,GP,JB l3
+    class HW,LG,AL l4
+            </div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background:#ff6b6b"></div> Level 1: Executive view (Is the cluster healthy?)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#ffb347"></div> Level 2: Infrastructure view (Which subsystem has issues?)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#22d3a8"></div> Level 3: Resource view (Which node or job is affected?)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#4a9eff"></div> Level 4: Diagnostic view (What is the root cause?)</div>
+            </div>
+            <div class="tip-box">
+                <h4>Dashboard Design Principles</h4>
+                <p>Use Grafana variables to enable seamless navigation between levels. For example, clicking a problematic rack in Level 2 should automatically filter Level 3 dashboards to show only that rack's nodes. Time range synchronization across dashboards helps correlate events during incident investigation.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p class="brand">@Erythix 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#4a9eff',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#7ab8ff',
+                lineColor: '#94a3b8',
+                secondaryColor: '#1e2a42',
+                tertiaryColor: '#2d3a52',
+                background: '#1e2a42',
+                mainBkg: '#2d3a52',
+                nodeBorder: '#94a3b8',
+                clusterBkg: '#0f172a',
+                clusterBorder: '#64748b',
+                titleColor: '#ffffff',
+                edgeLabelBackground: '#1e2a42',
+                fontSize: '16px',
+                fontFamily: 'Inter, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 30,
+                nodeSpacing: 50,
+                rankSpacing: 80
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true,
+                fontSize: 15,
+                actorMargin: 80,
+                messageMargin: 40
+            }
+        });
+    </script>
+</body>
+</html>
